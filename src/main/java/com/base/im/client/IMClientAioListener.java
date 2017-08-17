@@ -36,6 +36,6 @@ public class IMClientAioListener implements ClientAioListener<Object, IMPacket, 
 
     @Override
     public void onAfterClose(ChannelContext<Object, IMPacket, Object> channelContext, Throwable throwable, String remark, boolean isRemove) throws Exception {
-        System.out.println("-------------客户端onAfterClose"+throwable.getMessage()+" "+remark+" "+isRemove);
+        System.out.println("-------------服务端断开"+channelContext.getUserid()+"onAfterClose"+throwable.getMessage()+" "+remark+" "+isRemove);
     }
 }

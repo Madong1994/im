@@ -1,7 +1,10 @@
 package com.base.im.common;
 
 import com.base.im.common.handlers.BaseHandleImpl;
+import com.base.im.common.handlers.BaseHandler;
+import com.base.im.common.interceptor.HandlerInterceptor;
 import com.base.im.common.protof.RequestModel;
+import com.base.im.common.util.annotation.IMInterceptor;
 import com.base.im.common.util.annotation.IMRequest;
 import com.base.im.common.util.tool.ClassScaner;
 import com.base.im.common.util.tool.StringUtils;
@@ -10,6 +13,7 @@ import org.tio.core.ChannelContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.List;
 
 /**
@@ -28,17 +32,26 @@ import java.util.List;
  */
 public class DispatcherHandler {
     private static final Log log = Log.getLog(DispatcherHandler.class);
-    private static List<Class<BaseHandleImpl>> BaseHandleImplClassList = ClassScaner.scanSubClass(BaseHandleImpl.class);
+    private static List<Class<BaseHandler>> BaseHandleImplClassList = ClassScaner.scanSubClass(BaseHandler.class);
 
     public static String handler(RequestModel.ImRequest imRequest, ChannelContext<Object, IMPacket, Object> channelContext) {
         if (BaseHandleImplClassList != null) {
             for (Class<?> impl : BaseHandleImplClassList) {
                 IMRequest annotation = impl.getAnnotation(IMRequest.class);
+                IMInterceptor interceptor = impl.getAnnotation(IMInterceptor.class);
                 if (null != annotation) {
                     try {
-                        Method method = impl.getMethod("init", RequestModel.ImRequest.class, ChannelContext.class);
-                        Object object = impl.newInstance();
-                        return (String) method.invoke(object, imRequest, channelContext);
+                        if(interceptor != null){
+                            BaseHandler baseHandle = (BaseHandler) impl.newInstance();
+                            HandlerInterceptor handlerInterceptor = new HandlerInterceptor(baseHandle);
+                            BaseHandler baseHandle1 = (BaseHandler) Proxy.newProxyInstance(handlerInterceptor.getClass().getClassLoader(),baseHandle.getClass().getInterfaces(),handlerInterceptor);
+                            return baseHandle1.init(imRequest, channelContext);
+                        }else {
+                            Method method = impl.getMethod("init", RequestModel.ImRequest.class, ChannelContext.class);
+                            Object object = impl.newInstance();
+                            return (String) method.invoke(object, imRequest, channelContext);
+                        }
+
                     } catch (NoSuchMethodException e) {
                         e.printStackTrace();
                         log.error(e.getMessage());

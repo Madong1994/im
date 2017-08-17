@@ -37,7 +37,7 @@ public class IMServerAioListener implements ServerAioListener<Object, IMPacket, 
 
     @Override
     public void onAfterClose(ChannelContext<Object, IMPacket, Object> channelContext, Throwable throwable, String s, boolean b) throws Exception {
-        System.out.println("---------------onAfterClose");//终端断开连接
+        System.out.println("---------------客户端断开"+channelContext.getUserid()+"onAfterClose");//终端断开连接
 //        IMcacheMap.cacheMap.removeValue(channelContext);
     }
 }

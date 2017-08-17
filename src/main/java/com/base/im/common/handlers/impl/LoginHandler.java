@@ -2,8 +2,10 @@ package com.base.im.common.handlers.impl;
 
 import com.base.im.common.IMPacket;
 import com.base.im.common.handlers.BaseHandleImpl;
+import com.base.im.common.handlers.BaseHandler;
 import com.base.im.common.protof.RequestModel;
 import com.base.im.common.protof.ResponseModel;
+import com.base.im.common.util.annotation.IMInterceptor;
 import com.base.im.common.util.annotation.IMRequest;
 import org.tio.core.Aio;
 import org.tio.core.ChannelContext;
@@ -23,7 +25,8 @@ import org.tio.core.ChannelContext;
  * 注意：本内容仅限于华夏九鼎内部传阅，禁止外泄以及用于其他的商业目的
  */
 @IMRequest(requestCode = 0)
-public class LoginHandler extends BaseHandleImpl {
+@IMInterceptor
+public class LoginHandler implements BaseHandler {
     @Override
     public String init(RequestModel.ImRequest imRequest, ChannelContext<Object, IMPacket, Object> channelContext) {
         Aio.bindUser(channelContext,imRequest.getUniqueOne());
