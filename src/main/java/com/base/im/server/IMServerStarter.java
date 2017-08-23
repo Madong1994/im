@@ -36,6 +36,7 @@ public class IMServerStarter{
 		aioListener = new IMServerAioListener(); // 可以为空
 		serverGroupContext = new ServerGroupContext<>(aioHandler, aioListener);
 		aioServer = new AioServer<>(serverGroupContext);
+
 		try {
 			aioServer.start(serverIp, serverPort);
 		} catch (IOException e) {

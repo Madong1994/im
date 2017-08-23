@@ -1,13 +1,12 @@
 package com.base.im.common;
 
-import com.base.im.common.handlers.BaseHandleImpl;
 import com.base.im.common.handlers.BaseHandler;
+import com.base.im.common.interceptor.BaseInterceptor;
 import com.base.im.common.interceptor.HandlerInterceptor;
 import com.base.im.common.protof.RequestModel;
 import com.base.im.common.util.annotation.IMInterceptor;
 import com.base.im.common.util.annotation.IMRequest;
 import com.base.im.common.util.tool.ClassScaner;
-import com.base.im.common.util.tool.StringUtils;
 import com.jfinal.log.Log;
 import org.tio.core.ChannelContext;
 
@@ -31,7 +30,9 @@ import java.util.List;
  * 注意：本内容仅限于华夏九鼎内部传阅，禁止外泄以及用于其他的商业目的
  */
 public class DispatcherHandler {
+    public static BaseInterceptor b_interceptor;//拦截器逻辑接口
     private static final Log log = Log.getLog(DispatcherHandler.class);
+
     private static List<Class<BaseHandler>> BaseHandleImplClassList = ClassScaner.scanSubClass(BaseHandler.class);
 
     public static String handler(RequestModel.ImRequest imRequest, ChannelContext<Object, IMPacket, Object> channelContext) {
@@ -42,11 +43,14 @@ public class DispatcherHandler {
                 if (null != annotation) {
                     try {
                         if(interceptor != null){
+                            //使用注解拦截器
                             BaseHandler baseHandle = (BaseHandler) impl.newInstance();
-                            HandlerInterceptor handlerInterceptor = new HandlerInterceptor(baseHandle);
+                            interThrows();
+                            HandlerInterceptor handlerInterceptor = new HandlerInterceptor(baseHandle,b_interceptor);
                             BaseHandler baseHandle1 = (BaseHandler) Proxy.newProxyInstance(handlerInterceptor.getClass().getClassLoader(),baseHandle.getClass().getInterfaces(),handlerInterceptor);
                             return baseHandle1.init(imRequest, channelContext);
                         }else {
+                            //没有使用拦截器
                             Method method = impl.getMethod("init", RequestModel.ImRequest.class, ChannelContext.class);
                             Object object = impl.newInstance();
                             return (String) method.invoke(object, imRequest, channelContext);
@@ -64,10 +68,18 @@ public class DispatcherHandler {
                     } catch (InvocationTargetException e) {
                         e.printStackTrace();
                         log.error(e.getMessage());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        log.error(e.getMessage());
                     }
                 }
             }
         }
         return null;
+    }
+    private static void interThrows() throws Exception{
+        if(b_interceptor == null) {
+            throw new NullPointerException("regiestInterceptor=null,可能原因注册地方出错，请换在IMServerAioHandler类中registInterceptor()方法中注册");
+        }
     }
 }

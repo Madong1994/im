@@ -4,10 +4,9 @@ package com.base.im.server;
 import com.base.im.common.DispatcherHandler;
 import com.base.im.common.IMAbsAioHandler;
 import com.base.im.common.IMPacket;
+import com.base.im.common.interceptor.impl.LoginInterceptor;
 import com.base.im.common.protof.RequestModel;
 import com.base.im.common.util.HandlerCode;
-import com.base.im.common.util.IMcacheMap;
-import org.tio.core.Aio;
 import org.tio.core.ChannelContext;
 import org.tio.server.intf.ServerAioHandler;
 
@@ -34,10 +33,20 @@ public class IMServerAioHandler extends IMAbsAioHandler implements ServerAioHand
              */
             RequestModel.ImRequest imRequest = RequestModel.ImRequest.parseFrom(body);
             if (imRequest.getHandler() == HandlerCode.REQUEST) {
+                registInterceptor(imRequest);
                 DispatcherHandler.handler(imRequest, channelContext);
             }
         }
         return null;
+    }
+
+    /**
+     * 根据自己的逻辑注册拦截器
+     * @param imRequest
+     */
+    private void registInterceptor(RequestModel.ImRequest imRequest){
+        LoginInterceptor loginInterceptor = new LoginInterceptor();
+        DispatcherHandler.b_interceptor = loginInterceptor;
     }
 }
 
