@@ -1,10 +1,10 @@
 package com.base.im.client;
 
 
-import com.base.im.common.Const;
-import com.base.im.common.IMPacket;
 
-import com.base.im.common.protof.RequestModel;
+import com.base.im.client.common.Const;
+import com.base.im.client.common.IMPacket;
+import com.base.im.client.common.protof.RequestModel;
 import org.tio.client.AioClient;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientGroupContext;

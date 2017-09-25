@@ -1,15 +1,13 @@
 package com.base.im.client;
 
-import com.base.im.common.IMAbsAioHandler;
-import com.base.im.common.IMPacket;
-//import com.base.utils.GZipUtil;
-import com.base.im.common.protof.RequestModel;
-import com.base.im.common.protof.ResponseModel;
+
+import com.base.im.client.common.IMAbsAioHandler;
+import com.base.im.client.common.IMPacket;
+import com.base.im.client.common.protof.ResponseModel;
 import org.tio.client.intf.ClientAioHandler;
 import org.tio.core.ChannelContext;
-
-public class IMClientAioHandler extends IMAbsAioHandler implements ClientAioHandler<Object, IMPacket, Object>
-{
+//IMAbsAioHandler implements ClientAioHandler<Object, IMPacket, Object>
+public class IMClientAioHandler extends IMAbsAioHandler implements ClientAioHandler<Object, IMPacket, Object> {
 	/** 
 	 * 处理消息
 	 */
